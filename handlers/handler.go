@@ -6,25 +6,49 @@ import (
 )
 
 func HelloHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Hello, world!\n")
+	if req.Method == http.MethodGet {
+		io.WriteString(w, "Hello, world!\n")
+	} else {
+		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	}
 }
 
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Article...\n")
+	if req.Method == http.MethodPost {
+		io.WriteString(w, "Posting Article...\n")
+	} else {
+		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	}
 }
 
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Article List\n")
+	if req.Method == http.MethodGet {
+		io.WriteString(w, "Article List\n")
+	} else {
+		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	}
 }
 
 func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Article No.1\n")
+	if req.Method == http.MethodGet {
+		io.WriteString(w, "Article No.1\n")
+	} else {
+		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	}
 }
 
 func PostArticleNiceHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Nice...\n")
+	if req.Method == http.MethodPost {
+		io.WriteString(w, "Posting Nice...\n")
+	} else {
+		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	}
 }
 
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Comment...\n")
+	if req.Method == http.MethodPost {
+		io.WriteString(w, "Posting Comment...\n")
+	} else {
+		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	}
 }
