@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/yourname/reponame/models"
 	"io"
 	"net/http"
 	"strconv"
@@ -13,24 +14,26 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Article...\n")
+  
+	article := models.Article1
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonData)
+
 }
 
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
-	queryMap := req.URL.Query()
-	var page int
-	if p, ok := queryMap["page"]; ok && len(p) > 0 {
-		var err error
-		page, err = strconv.Atoi(p[0])
-		if err != nil {
-			http.Error(w, "Invalid query parameter", http.StatusBadRequest)
-			return
-		}
-	} else {
-		page = 1
+	articles := []models.Article{models.Article1, models.Article2}
+	jsonData, err := json.Marshal(articles)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
 	}
-	resString := fmt.Sprintf("Article List (page %d)\n", page)
-	io.WriteString(w, resString)
+	w.Write(jsonData)
+
 }
 
 func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
@@ -39,14 +42,34 @@ func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
 		return
 	}
-	resString := fmt.Sprintf("Article No.%d\n", articleId)
-	io.WriteString(w, resString)
+	article.ID = articleId
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonData)
+
 }
 
 func PostArticleNiceHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Nice...\n")
+	article := models.Article1
+	article.NiceNum++
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonData)
 }
 
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Comment...\n")
+	comment := models.Comment1
+	jsonData, err := json.Marshal(comment)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonData)
+
 }
