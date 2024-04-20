@@ -1,54 +1,73 @@
 package handlers
 
 import (
+	"encoding/json"
+	"github.com/gorilla/mux"
+	"github.com/yourname/reponame/models"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 func HelloHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		io.WriteString(w, "Hello, world!\n")
-	} else {
-		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
-	}
+	io.WriteString(w, "Hello, world!\n")
 }
 
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodPost {
-		io.WriteString(w, "Posting Article...\n")
-	} else {
-		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	article := models.Article1
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
 	}
+	w.Write(jsonData)
+
 }
 
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		io.WriteString(w, "Article List\n")
-	} else {
-		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	articles := []models.Article{models.Article1, models.Article2}
+	jsonData, err := json.Marshal(articles)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
 	}
+	w.Write(jsonData)
 }
 
 func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		io.WriteString(w, "Article No.1\n")
-	} else {
-		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	articleId, err := strconv.Atoi(mux.Vars(req)["id"])
+	if err != nil {
+		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
+		return
 	}
+	article := models.Article1
+	article.ID = articleId
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonData)
+
 }
 
 func PostArticleNiceHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodPost {
-		io.WriteString(w, "Posting Nice...\n")
-	} else {
-		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	article := models.Article1
+	article.NiceNum++
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
 	}
+	w.Write(jsonData)
 }
 
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodPost {
-		io.WriteString(w, "Posting Comment...\n")
-	} else {
-		http.Error(w, "Invalid request method.", http.StatusMethodNotAllowed)
+	comment := models.Comment1
+	jsonData, err := json.Marshal(comment)
+	if err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
 	}
+	w.Write(jsonData)
 }
