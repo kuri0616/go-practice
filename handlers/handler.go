@@ -14,6 +14,7 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
+  
 	article := models.Article1
 	jsonData, err := json.Marshal(article)
 	if err != nil {
@@ -32,6 +33,7 @@ func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	w.Write(jsonData)
+
 }
 
 func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
@@ -40,7 +42,6 @@ func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
 		return
 	}
-	article := models.Article1
 	article.ID = articleId
 	jsonData, err := json.Marshal(article)
 	if err != nil {
@@ -70,4 +71,5 @@ func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	w.Write(jsonData)
+
 }
