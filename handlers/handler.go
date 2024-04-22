@@ -14,62 +14,44 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-  
-	article := models.Article1
-	jsonData, err := json.Marshal(article)
-	if err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+	var reqArticle models.Article
+	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
+		http.Error(w, "failed to decode json", http.StatusBadRequest)
 		return
 	}
-	w.Write(jsonData)
 
+	article := reqArticle
+	json.NewEncoder(w).Encode(article)
 }
 
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	articles := []models.Article{models.Article1, models.Article2}
-	jsonData, err := json.Marshal(articles)
-	if err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
-		return
-	}
-	w.Write(jsonData)
-
+	json.NewEncoder(w).Encode(articles)
 }
 
 func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
 	articleId, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
-		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
-		return
+		http.Error(w, "invalid id", http.StatusBadRequest)
 	}
+	article := models.Article1
 	article.ID = articleId
-	jsonData, err := json.Marshal(article)
-	if err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
-		return
-	}
-	w.Write(jsonData)
-
+	json.NewEncoder(w).Encode(article)
 }
 
 func PostArticleNiceHandler(w http.ResponseWriter, req *http.Request) {
 	article := models.Article1
 	article.NiceNum++
-	jsonData, err := json.Marshal(article)
-	if err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
-		return
-	}
-	w.Write(jsonData)
+	json.NewEncoder(w).Encode(article)
 }
 
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	comment := models.Comment1
-	jsonData, err := json.Marshal(comment)
-	if err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+	var reqComment models.Comment
+	if err := json.NewDecoder(req.Body).Decode(&reqComment); err != nil {
+		http.Error(w, "failed to decode json", http.StatusBadRequest)
 		return
 	}
-	w.Write(jsonData)
+	comment := reqComment
+	json.NewEncoder(w).Encode(comment)
 
 }
