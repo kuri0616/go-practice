@@ -77,3 +77,42 @@ where article_id = ?;
 	}
 	return article, nil
 }
+
+func UpdateNice(db *sql.DB, articleID int) error {
+	const getArticleSql = `
+select nice from articles where article_id = ?;
+`
+	const updateNiceSql = `
+update articles
+set nice = ?
+where article_id = ?;
+`
+
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	row := tx.QueryRow(getArticleSql, articleID)
+
+	if err := row.Err(); err != nil {
+		tx.Rollback
+		return err
+	}
+	var nicenum int
+
+	err = row.Scan(&nicenum)
+	if err != nil {
+		tx.Rollback
+		return err
+	}
+	_, err = tx.Exec(updateNiceSql, nicenum+1, articleID)
+	if err != nil {
+		tx.Rollback
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		tx.Rollback
+		return err
+	}
+	return nil
+}
