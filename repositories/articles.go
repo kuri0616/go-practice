@@ -43,7 +43,7 @@ limit ? offset ?;
 	for rows.Next() {
 		var article models.Article
 		var createdTime sql.NullTime
-		err := rows.Scan(&article.ID, &article.Title, &article.Content, &article.UserName, &article.NiceNum, createdTime)
+		err := rows.Scan(&article.ID, &article.Title, &article.Content, &article.UserName, &article.NiceNum, &createdTime)
 		if createdTime.Valid {
 			article.CreatedAt = createdTime.Time
 		}
@@ -68,7 +68,7 @@ where article_id = ?;
 	if err != nil {
 		return models.Article{}, err
 	}
-	err = row.Scan(&article.ID, &article.Title, &article.Content, &article.UserName, &article.NiceNum, createdTime)
+	err = row.Scan(&article.ID, &article.Title, &article.Content, &article.UserName, &article.NiceNum, &createdTime)
 	if createdTime.Valid {
 		article.CreatedAt = createdTime.Time
 	}
@@ -95,23 +95,30 @@ where article_id = ?;
 	row := tx.QueryRow(getArticleSql, articleID)
 
 	if err := row.Err(); err != nil {
-		tx.Rollback
+		if err := tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 	var nicenum int
 
 	err = row.Scan(&nicenum)
 	if err != nil {
-		tx.Rollback
-		return err
+		if err := tx.Rollback(); err != nil {
+			return err
+		}
 	}
 	_, err = tx.Exec(updateNiceSql, nicenum+1, articleID)
 	if err != nil {
-		tx.Rollback
+		if err := tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 	if err := tx.Commit(); err != nil {
-		tx.Rollback
+		if err := tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 	return nil
