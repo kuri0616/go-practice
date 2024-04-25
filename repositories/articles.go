@@ -43,7 +43,7 @@ limit ? offset ?;
 	for rows.Next() {
 		var article models.Article
 		var createdTime sql.NullTime
-		err := rows.Scan(&article.ID, &article.Title, &article.Content, &article.UserName, &article.NiceNum, createdTime)
+		err := rows.Scan(&article.ID, &article.Title, &article.Content, &article.UserName, &article.NiceNum, &createdTime)
 		if createdTime.Valid {
 			article.CreatedAt = createdTime.Time
 		}

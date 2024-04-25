@@ -78,10 +78,11 @@ func TestInsertArticle(t *testing.T) {
 		where article_id = ?;
 	`
 		_, err := testDB.Exec(sqlStr, newArticle.ID)
+
+		if err != nil {
+			t.Error(err)
+		}
 	})
-	if err != nil {
-		t.Error(err)
-	}
 }
 
 func TestUpdateNice(t *testing.T) {
@@ -91,9 +92,12 @@ func TestUpdateNice(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if expectedNiceNum != testdata.ArticleTestData[0].NiceNum {
-		t.Errorf("expectedNiceNum = %v, want %v", expectedNiceNum, testdata.ArticleTestData[0].NiceNum)
+
+	got, _ := repositories.SelectArticle(testDB, articleID)
+	if expectedNiceNum != got.NiceNum {
+		t.Errorf("expectedNiceNum = %v, want %v", expectedNiceNum, got.NiceNum)
 	}
+
 	t.Cleanup(func() {
 		beforeNiceNum := testdata.ArticleTestData[0].NiceNum - 1
 		const sqlStr = `
