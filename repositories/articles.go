@@ -78,7 +78,7 @@ where article_id = ?;
 	return article, nil
 }
 
-func UpdateNice(db *sql.DB, articleID int) error {
+func UpdateNice(db *sql.DB, articleID int) (models.Article, error) {
 	const getArticleSql = `
 select nice from articles where article_id = ?;
 `
@@ -90,36 +90,37 @@ where article_id = ?;
 
 	tx, err := db.Begin()
 	if err != nil {
-		return err
+		return models.Article{}, err
 	}
 	row := tx.QueryRow(getArticleSql, articleID)
 
 	if err := row.Err(); err != nil {
 		if err := tx.Rollback(); err != nil {
-			return err
+			return models.Article{}, err
 		}
-		return err
+		return models.Article{}, err
 	}
-	var nicenum int
+	var article models.Article
 
-	err = row.Scan(&nicenum)
+	err = row.Scan(&article)
 	if err != nil {
 		if err := tx.Rollback(); err != nil {
-			return err
+			return models.Article{}, err
 		}
 	}
-	_, err = tx.Exec(updateNiceSql, nicenum+1, articleID)
+	_, err = tx.Exec(updateNiceSql, article.NiceNum+1, articleID)
 	if err != nil {
 		if err := tx.Rollback(); err != nil {
-			return err
+			return models.Article{}, err
 		}
-		return err
+		return models.Article{}, err
 	}
 	if err := tx.Commit(); err != nil {
 		if err := tx.Rollback(); err != nil {
-			return err
+			return models.Article{}, err
 		}
-		return err
+		return models.Article{}, err
 	}
-	return nil
+	article.NiceNum++
+	return article, nil
 }

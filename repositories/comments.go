@@ -39,7 +39,7 @@ where article_id = ?;
 	for rows.Next() {
 		var comment models.Comment
 		var createdTime sql.NullTime
-		err := rows.Scan(&comment.CommentID, &comment.ArticleID, &comment.Message, createdTime)
+		err := rows.Scan(&comment.CommentID, &comment.ArticleID, &comment.Message, &createdTime)
 		if createdTime.Valid {
 			comment.CreatedAt = createdTime.Time
 		}

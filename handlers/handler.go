@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/yourname/reponame/models"
+	"github.com/yourname/reponame/services"
 	"io"
 	"net/http"
 	"strconv"
@@ -19,30 +20,71 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "failed to decode json", http.StatusBadRequest)
 		return
 	}
+	resArticle, err := services.PostArticleSerrvice(reqArticle)
+	if err != nil {
+		http.Error(w, "failed to insert article", http.StatusInternalServerError)
+		return
+	}
 
-	article := reqArticle
-	json.NewEncoder(w).Encode(article)
+	if err := json.NewEncoder(w).Encode(resArticle); err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
 }
 
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
-	articles := []models.Article{models.Article1, models.Article2}
-	json.NewEncoder(w).Encode(articles)
+	queryMap := req.URL.Query()
+	if p, OK := queryMap["page"]; OK && len(p) > 0 {
+		page, err := strconv.Atoi(p[0])
+		if err != nil {
+			http.Error(w, "invalid page number", http.StatusBadRequest)
+			return
+		}
+		articleList, err := services.ArticleListHandler(page)
+		if err != nil {
+			http.Error(w, "failed to get article list", http.StatusInternalServerError)
+			return
+		}
+		if err := json.NewEncoder(w).Encode(articleList); err != nil {
+			http.Error(w, "failed to encode json", http.StatusInternalServerError)
+			return
+		}
+	}
 }
 
 func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
 	articleId, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		http.Error(w, "invalid article id", http.StatusBadRequest)
+		return
 	}
-	article := models.Article1
-	article.ID = articleId
-	json.NewEncoder(w).Encode(article)
+	article, err := services.GetArticleService(articleId)
+	if err != nil {
+		http.Error(w, "failed to get article", http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(article); err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
 }
 
 func PostArticleNiceHandler(w http.ResponseWriter, req *http.Request) {
-	article := models.Article1
-	article.NiceNum++
-	json.NewEncoder(w).Encode(article)
+	articleId, err := strconv.Atoi(mux.Vars(req)["id"])
+	if err != nil {
+		http.Error(w, "invalid article id", http.StatusBadRequest)
+		return
+	}
+	article, err := services.PostNiceService(articleId)
+	if err != nil {
+		http.Error(w, "failed to update nice", http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(article); err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
 }
 
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
@@ -51,7 +93,14 @@ func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "failed to decode json", http.StatusBadRequest)
 		return
 	}
-	comment := reqComment
-	json.NewEncoder(w).Encode(comment)
+	comment, err := services.PostCommentService(reqComment)
+	if err != nil {
+		http.Error(w, "failed to insert comment", http.StatusInternalServerError)
+		return
+	}
 
+	if err := json.NewEncoder(w).Encode(comment); err != nil {
+		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		return
+	}
 }
