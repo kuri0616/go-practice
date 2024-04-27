@@ -52,16 +52,17 @@ func ArticleListHandler(page int) ([]models.Article, error) {
 	return articleList, nil
 }
 
-func PostNiceService(articleID int) error {
+func PostNiceService(articleID int) (models.Article, error) {
 	db, err := connectDB()
 	if err != nil {
-		return err
+		return models.Article{}, err
 	}
 	defer db.Close()
 
-	err = repositories.UpdateNice(db, article)
+	article, err := repositories.UpdateNice(db, articleID)
 	if err != nil {
-		return err
+		return models.Article{}, err
 	}
-	return nil
+
+	return article, nil
 }

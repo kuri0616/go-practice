@@ -11,7 +11,7 @@ var (
 	dbUser     = os.Getenv("DB_USER")
 	dbPass     = os.Getenv("DB_PASS")
 	dbDatabase = os.Getenv("DB_NAME")
-	dbConn     = fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)%s?parseTime=true", dbUser, dbPass, dbDatabase)
+	dbConn     = fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPass, dbDatabase)
 )
 
 func connectDB() (*sql.DB, error) {
