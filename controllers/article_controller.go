@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/yourname/reponame/apperrors"
 	"github.com/yourname/reponame/controllers/services"
 	"github.com/yourname/reponame/models"
 	"net/http"
@@ -20,17 +21,20 @@ func NewArticleController(s services.ArticleServicer) *ArticleController {
 func (c *ArticleController) PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
-		http.Error(w, "failed to decode json", http.StatusBadRequest)
+		err = apperrors.ReqBodyDecodeFailed.Wrap(err, "failed to decode json")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	resArticle, err := c.service.PostArticleService(reqArticle)
 	if err != nil {
-		http.Error(w, "failed to insert article", http.StatusInternalServerError)
+		err = apperrors.InsertDataFailed.Wrap(err, "failed to insert article")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(resArticle); err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		err = apperrors.ReqBodyEncodeFailed.Wrap(err, "failed to encode json")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
@@ -40,16 +44,19 @@ func (c *ArticleController) GetArticleListHandler(w http.ResponseWriter, req *ht
 	if p, OK := queryMap["page"]; OK && len(p) > 0 {
 		page, err := strconv.Atoi(p[0])
 		if err != nil {
-			http.Error(w, "invalid page number", http.StatusBadRequest)
+			err = apperrors.BadParam.Wrap(err, "invalid page number")
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 		articleList, err := c.service.ArticleListHandler(page)
 		if err != nil {
-			http.Error(w, "failed to get article list", http.StatusInternalServerError)
+			err = apperrors.GetDataFailed.Wrap(err, "failed to get article list")
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 		if err := json.NewEncoder(w).Encode(articleList); err != nil {
-			http.Error(w, "failed to encode json", http.StatusInternalServerError)
+			err = apperrors.ReqBodyEncodeFailed.Wrap(err, "failed to encode json")
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 	}
@@ -58,17 +65,20 @@ func (c *ArticleController) GetArticleListHandler(w http.ResponseWriter, req *ht
 func (c *ArticleController) GetArticleHandler(w http.ResponseWriter, req *http.Request) {
 	articleId, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
-		http.Error(w, "invalid article id", http.StatusBadRequest)
+		err = apperrors.BadParam.Wrap(err, "invalid article id")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	article, err := c.service.GetArticleService(articleId)
 	if err != nil {
-		http.Error(w, "failed to get article", http.StatusInternalServerError)
+		err = apperrors.GetDataFailed.Wrap(err, "failed to get article")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(article); err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		err = apperrors.ReqBodyEncodeFailed.Wrap(err, "failed to encode json")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
@@ -76,16 +86,19 @@ func (c *ArticleController) GetArticleHandler(w http.ResponseWriter, req *http.R
 func (c *ArticleController) PostArticleNiceHandler(w http.ResponseWriter, req *http.Request) {
 	articleId, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
-		http.Error(w, "invalid article id", http.StatusBadRequest)
+		err = apperrors.BadParam.Wrap(err, "invalid article id")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	article, err := c.service.PostNiceService(articleId)
 	if err != nil {
+		apperrors.ErrorHandler(w, req, err)
 		http.Error(w, "failed to update nice", http.StatusInternalServerError)
 		return
 	}
 	if err := json.NewEncoder(w).Encode(article); err != nil {
-		http.Error(w, "failed to encode json", http.StatusInternalServerError)
+		err = apperrors.ReqBodyEncodeFailed.Wrap(err, "failed to encode json")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }

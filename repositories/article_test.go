@@ -88,7 +88,7 @@ func TestInsertArticle(t *testing.T) {
 func TestUpdateNice(t *testing.T) {
 	expectedNiceNum := testdata.ArticleTestData[0].NiceNum + 1
 	articleID := testdata.ArticleTestData[0].ID
-	err := repositories.UpdateNice(testDB, articleID)
+	_, err := repositories.UpdateNice(testDB, articleID)
 	if err != nil {
 		t.Error(err)
 	}
