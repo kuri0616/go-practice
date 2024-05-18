@@ -36,7 +36,7 @@ func (s *MyAppService) PostArticleService(article models.Article) (models.Articl
 	return newArticle, nil
 }
 
-func (s *MyAppService) ArticleListHandler(page int) ([]models.Article, error) {
+func (s *MyAppService) ArticleListService(page int) ([]models.Article, error) {
 	articleList, err := repositories.SelectArticleList(s.db, page)
 	if err != nil {
 		err = apperrors.GetDataFailed.Wrap(err, "failed to select article list")

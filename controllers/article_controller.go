@@ -48,7 +48,7 @@ func (c *ArticleController) GetArticleListHandler(w http.ResponseWriter, req *ht
 			apperrors.ErrorHandler(w, req, err)
 			return
 		}
-		articleList, err := c.service.ArticleListHandler(page)
+		articleList, err := c.service.ArticleListService(page)
 		if err != nil {
 			err = apperrors.GetDataFailed.Wrap(err, "failed to get article list")
 			apperrors.ErrorHandler(w, req, err)
